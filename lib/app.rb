@@ -8,11 +8,12 @@ products_hash = JSON.parse(file)
 
 $brand_data = {}
 
-def update_brand_data(brand_name, sum_retail_price, sum_purchase_price)
+def update_brand_data(brand_name, sum_retail_price, sum_purchase_price, stock)
 	if  $brand_data[brand_name].nil?
-		 $brand_data[brand_name] = {count: 1, sum_price: sum_retail_price.to_f, sales: sum_purchase_price.to_f}
+		 $brand_data[brand_name] = {count: 1, stock: stock, sum_price: sum_retail_price.to_f, sales: sum_purchase_price.to_f}
 	else
-		 $brand_data[brand_name][:count] += 1
+		$brand_data[brand_name][:count] += 1
+		 $brand_data[brand_name][:stock] += stock
 		 $brand_data[brand_name][:sum_price] += sum_retail_price.to_f
 		 $brand_data[brand_name][:sales] += sum_purchase_price
 	end
@@ -58,10 +59,10 @@ products_hash["items"].each do |toy|
 	# Calculate and print the average price the toy sold for
 	puts "Average Sale Price: $" + (sum_purchase_price / num_purchases).to_s
 	# Calculate and print the average discount based off the average sales price
-	puts "Average Discount Percent: " + ((sum_discount / num_purchases) * 100).round(2).to_s + "%"
+	puts "Average Discount Percent: " + ((1 - (sum_discount / num_purchases)) * 100).round(2).to_s + "%"
 	puts
 
-	update_brand_data toy["brand"], toy["full-price"], sum_purchase_price
+	update_brand_data toy["brand"], toy["full-price"], sum_purchase_price, toy["stock"]
 
 end
 
@@ -79,7 +80,7 @@ $brand_data.each do |brand_name, data|
 		puts brand_name
 		puts DEMARK
     # Count and print the number of the brand's toys we stock
-		puts "Number of Products: " + data[:count].to_s
+		puts "Number of Items in Stock: " + data[:stock].to_s
     # Calculate and print the average price of the brand's toys
 		puts "Average Retail Price: $" + (data[:sum_price] / data[:count]).round(2).to_s
     # Calculate and print the total sales volume of all the brand's toys combined
